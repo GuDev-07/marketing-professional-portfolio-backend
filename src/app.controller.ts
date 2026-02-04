@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { ProjectResponseDto } from './modules/projects/dto/project-response.dto';
+import { ProjectsService } from './modules/projects/projects.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getRoot(): ProjectResponseDto[] {
+    return this.projectsService.findAll();
   }
 }
