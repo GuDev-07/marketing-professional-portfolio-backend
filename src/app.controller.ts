@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ProjectResponseDto } from './modules/projects/dto/project-response.dto';
+import { Project } from '@prisma/client';
 import { ProjectsService } from './modules/projects/projects.service';
 
 @Controller()
@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
-  getRoot(): ProjectResponseDto[] {
+  async getRoot(): Promise<Project[]> {
     return this.projectsService.findAll();
   }
 }

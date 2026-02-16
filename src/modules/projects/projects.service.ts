@@ -1,32 +1,47 @@
 import { Injectable } from '@nestjs/common';
-import { ProjectResponseDto } from './dto/project-response.dto';
+import { Project } from '@prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ProjectsService {
-  private readonly projects: ProjectResponseDto[] = [
-    {
-      id: 1,
-      title: 'Project Alpha',
-      category: 'Web Development',
-      description: 'A web development project for a client.',
-      client: 'Client A',
-      imageURL: 'https://example.com/images/project-alpha.jpg',
-    },
-    {
-      id: 2,
-      title: 'Tráfego Pago Etec',
-      category: 'Tráfego Pago',
-      description: 'Estratégia de anúncios com alto ROI.',
-      client: 'Etec APAN',
-      imageURL: 'https://picsum.photos/id/48/800/600',
-    },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): ProjectResponseDto[] {
-    return this.projects;
+  async findAll(): Promise<Project[]> {
+    return this.prisma.project.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
-  findOne(id: number): ProjectResponseDto | undefined {
-    return this.projects.find((p) => p.id === id);
+  async findOne(id: number): Promise<Project | null> {
+    return this.prisma.project.findUnique({
+      where: { id: BigInt(id) },
+    });
+  }
+
+  async create(data: {
+    title: string;
+    category: string;
+    description: string;
+    client?: string | null;
+    imageUrl: string;
+  }): Promise<Project> {
+    return this.prisma.project.create({ data });
+  }
+
+  async update(
+    id: number,
+    data: Partial<{
+      title: string;
+      category: string;
+      description: string;
+      client?: string | null;
+      imageUrl: string;
+    }>,
+  ): Promise<Project> {
+    return this.prisma.project.update({ where: { id: BigInt(id) }, data });
+  }
+
+  async remove(id: number): Promise<Project> {
+    return this.prisma.project.delete({ where: { id: BigInt(id) } });
   }
 }

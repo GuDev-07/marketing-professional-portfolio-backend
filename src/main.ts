@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import 'dotenv/config';
 import { join } from 'path';
 import { AppModule } from './app.module';
 
@@ -36,4 +37,4 @@ async function bootstrap() {
 
   await app.listen(PORT);
 }
-bootstrap();
+void bootstrap();
