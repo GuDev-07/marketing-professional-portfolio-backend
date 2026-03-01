@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Project } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreateProjectRequestDto } from './dto/request/create-project-request.dto';
+import { UpdateProjectRequestDto } from './dto/request/update-project-request.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -12,36 +14,26 @@ export class ProjectsService {
     });
   }
 
-  async findOne(id: number): Promise<Project | null> {
+  async findOne(id: bigint): Promise<Project | null> {
     return this.prisma.project.findUnique({
-      where: { id: BigInt(id) },
+      where: { id },
     });
   }
 
-  async create(data: {
-    title: string;
-    category: string;
-    description: string;
-    client?: string | null;
-    imageUrl: string;
-  }): Promise<Project> {
+  async create(data: CreateProjectRequestDto): Promise<Project> {
     return this.prisma.project.create({ data });
   }
 
-  async update(
-    id: number,
-    data: Partial<{
-      title: string;
-      category: string;
-      description: string;
-      client?: string | null;
-      imageUrl: string;
-    }>,
-  ): Promise<Project> {
-    return this.prisma.project.update({ where: { id: BigInt(id) }, data });
+  async update(id: bigint, data: UpdateProjectRequestDto): Promise<Project> {
+    return this.prisma.project.update({
+      where: { id },
+      data,
+    });
   }
 
-  async remove(id: number): Promise<Project> {
-    return this.prisma.project.delete({ where: { id: BigInt(id) } });
+  async remove(id: bigint): Promise<Project> {
+    return this.prisma.project.delete({
+      where: { id },
+    });
   }
 }

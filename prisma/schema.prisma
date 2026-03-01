@@ -4,7 +4,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas  = ["public"]
 }
+
 model Feedback {
   id        BigInt   @id @default(autoincrement())
   name      String   @unique
@@ -14,18 +16,20 @@ model Feedback {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("feedbacks")
+  @@schema("public")
 }
 
 model Project {
   id          BigInt   @id @default(autoincrement())
-  title       String   @unique
-  category    String
+  title       String
+  category    ProjectCategory
   description String
   client      String?
   imageUrl    String   @map("image_url")
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("projects")
+  @@schema("public")
 }
 
 model TimelineExperience {
@@ -41,6 +45,7 @@ model TimelineExperience {
   gallery    TimelineGallery[]
 
   @@map("timeline_experiences")
+  @@schema("public")
 }
 
 model TimelineGallery {
@@ -52,4 +57,31 @@ model TimelineGallery {
   experience   TimelineExperience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
 
   @@map("timeline_gallery")
+  @@schema("public")
+}
+
+enum Role {
+  ADMIN
+  USER
+
+  @@schema("public")
+}
+
+enum ProjectCategory {
+  BRANDING_IDENTIDADE @map("Branding & Identidade")
+  TRAFEGO_PAGO @map("Tráfego Pago")
+  GESTAO_REDES_SOCIAIS @map("Gestão de Redes Sociais")
+  CRM_AUTOMACAO @map("CRM & Automação")
+  MIDIA_OFF @map("Mídia Off")
+
+  @@schema("public")
+}
+
+model Profile {
+  id        String   @id @default(uuid()) @db.Uuid
+  role      Role     @default(USER)
+  createdAt DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("profiles")
+  @@schema("public")
 }

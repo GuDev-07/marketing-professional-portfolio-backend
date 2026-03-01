@@ -27,7 +27,7 @@ async function bootstrap() {
 
   if (NODE_ENV === 'development') {
     const config = new DocumentBuilder()
-      .setTitle('API')
+      .setTitle('mkt-professional-portfolio API')
       .setVersion('1.0')
       .addBearerAuth()
       .build();

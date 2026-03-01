@@ -7,7 +7,6 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -30,6 +29,7 @@ export class ProjectsController {
   @ApiResponse({
     status: 200,
     description: 'List of projects',
+    type: ProjectResponseDto,
     isArray: true,
   })
   async findAll(): Promise<Project[]> {
@@ -38,18 +38,20 @@ export class ProjectsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get project by id' })
-  @ApiParam({ name: 'id', example: 1 })
+  @ApiParam({ name: 'id', example: '1' })
   @ApiResponse({
     status: 200,
     description: 'Project found',
+    type: ProjectResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Project not found' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
-    const project = await this.projectsService.findOne(id);
+  async findOne(@Param('id') id: number): Promise<Project> {
+    const project = await this.projectsService.findOne(BigInt(id));
 
     if (!project) {
       throw new NotFoundException(`Project with id ${id} not found`);
     }
+
     return project;
   }
 
@@ -74,20 +76,17 @@ export class ProjectsController {
     type: ProjectResponseDto,
   })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() body: UpdateProjectRequestDto,
   ): Promise<Project> {
-    const project = await this.projectsService.update(id, body);
-    if (!project)
-      throw new NotFoundException(`Project with id ${id} not found`);
-    return project;
+    return this.projectsService.update(BigInt(id), body);
   }
 
   @UseGuards(AdminGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a project' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    await this.projectsService.remove(id);
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.projectsService.remove(BigInt(id));
   }
 }
