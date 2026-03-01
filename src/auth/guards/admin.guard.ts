@@ -6,11 +6,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { PrismaService } from '../../prisma/prisma.service';
 import { SupabaseService } from '../../supabase/supabase.service';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private prisma: PrismaService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -28,13 +32,16 @@ export class AdminGuard implements CanActivate {
       throw new UnauthorizedException('Token inválido');
     }
 
-    const { data: profile } = await this.supabase.client
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .single();
+    const profile = await this.prisma.profile.findUnique({
+      where: { id: data.user.id },
+      select: { role: true },
+    });
 
-    if (profile?.role !== 'admin') {
+    if (!profile) {
+      throw new ForbiddenException('Perfil não encontrado para este usuário');
+    }
+
+    if (!profile.role || profile.role.toUpperCase() !== 'ADMIN') {
       throw new ForbiddenException('Acesso restrito a admin');
     }
 

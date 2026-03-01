@@ -1,16 +1,21 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUrl } from 'class-validator';
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ProjectCategory } from '@prisma/client';
+import { Expose } from 'class-transformer';
+import { IsEnum, IsOptional, IsString, IsUrl } from 'class-validator';
+import { CreateProjectRequestDto } from './create-project-request.dto';
 
-export class UpdateProjectRequestDto {
+export class UpdateProjectRequestDto extends PartialType(
+  CreateProjectRequestDto,
+) {
   @ApiPropertyOptional({ example: 'My project title' })
   @IsOptional()
   @IsString()
   title?: string;
 
-  @ApiPropertyOptional({ example: 'web' })
+  @ApiPropertyOptional({ enum: ProjectCategory })
   @IsOptional()
-  @IsString()
-  category?: string;
+  @IsEnum(ProjectCategory)
+  category?: ProjectCategory;
 
   @ApiPropertyOptional({ example: 'A description of the project' })
   @IsOptional()
@@ -26,5 +31,6 @@ export class UpdateProjectRequestDto {
   @IsOptional()
   @IsString()
   @IsUrl()
+  @Expose({ name: 'image_url' })
   imageUrl?: string;
 }
